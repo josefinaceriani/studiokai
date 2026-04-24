@@ -1,1 +1,984 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studio KAI — Habitá tu calma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 
+:root{
+  /* ── Brand palette ── */
+  --linen:      #EFEDDE;   /* background principal */
+  --olive:      #62623E;   /* verde oliva — acción, acento fuerte */
+  --mocha:      #7D614C;   /* marrón cálido — acento secundario */
+  --blush:      #D6A3A8;   /* rosa palo — acento suave */
+
+  /* ── Derivados ── */
+  --linen-dk:   #E5E2CF;   /* linen ligeramente más oscuro */
+  --linen-dkr:  #D8D4BF;   /* hover, bordes */
+  --olive-lt:   #8E8E5A;   /* olive más claro */
+  --olive-pale: #EEEEE2;   /* tint muy suave de olive */
+  --mocha-lt:   #A68470;   /* mocha claro */
+  --mocha-pale: #F2EBE6;   /* tint muy suave de mocha */
+  --blush-lt:   #E8C4C7;   /* blush claro */
+  --blush-pale: #F9F1F2;   /* tint muy suave de blush */
+  --ink:        #1E1C13;   /* casi negro cálido */
+  --ink-70:     rgba(30,28,19,.7);
+  --ink-40:     rgba(30,28,19,.4);
+  --ink-15:     rgba(30,28,19,.12);
+  --ink-06:     rgba(30,28,19,.055);
+
+  --f-serif:    'Cormorant', serif;
+  --f-sans:     'Jost', sans-serif;
+  --ease:       cubic-bezier(.25,.1,.25,1);
+}
+
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--f-sans);
+  background:var(--linen);
+  color:var(--ink);
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:var(--linen-dkr)}
+::selection{background:var(--blush-pale);color:var(--mocha)}
+
+/* ══════════════════════════
+   NAV
+══════════════════════════ */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.3rem 1.5rem;
+  transition:background .5s var(--ease),padding .5s var(--ease),border-color .5s;
+  border-bottom:1px solid transparent;
+}
+.nav.scrolled{
+  background:rgba(239,237,222,.96);
+  backdrop-filter:blur(18px);
+  padding:.95rem 1.5rem;
+  border-bottom-color:var(--ink-06);
+}
+.nav-logo{
+  font-family:var(--f-serif);font-size:1.15rem;font-weight:400;
+  letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink);text-decoration:none;
+  transition:opacity .3s;
+}
+.nav-logo:hover{opacity:.55}
+.nav-links{list-style:none;display:none;gap:2.5rem}
+.nav-links a{
+  font-size:.63rem;font-weight:300;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink);text-decoration:none;opacity:.55;transition:opacity .3s;
+}
+.nav-links a:hover{opacity:1}
+.nav-right{display:flex;align-items:center;gap:1.2rem}
+.nav-book{
+  font-size:.6rem;font-weight:300;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink);text-decoration:none;
+  border-bottom:1px solid var(--ink-40);padding-bottom:1px;
+  transition:border-color .3s,opacity .3s;
+}
+.nav-book:hover{border-color:var(--ink);opacity:.6}
+
+/* burger */
+.burger{display:flex;flex-direction:column;gap:6px;background:none;border:none;cursor:pointer;padding:2px}
+.burger-line{display:block;width:20px;height:1px;background:var(--ink);transition:all .4s var(--ease);transform-origin:center}
+.burger.open .burger-line:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.burger.open .burger-line:nth-child(2){opacity:0;transform:scaleX(0)}
+.burger.open .burger-line:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+/* drawer */
+.mobile-drawer{
+  position:fixed;inset:0;z-index:190;
+  background:var(--linen);
+  display:flex;flex-direction:column;justify-content:center;
+  padding:6rem 2rem 3rem;
+  transform:translateX(100%);
+  transition:transform .6s cubic-bezier(.76,0,.24,1);
+}
+.mobile-drawer.open{transform:translateX(0)}
+.drawer-link{
+  font-family:var(--f-serif);font-size:clamp(2.2rem,9vw,3.5rem);
+  font-weight:300;font-style:italic;
+  color:var(--ink);text-decoration:none;
+  padding:.6rem 0;border-bottom:1px solid var(--ink-06);display:block;
+  opacity:.8;transition:opacity .3s,color .3s,letter-spacing .3s;letter-spacing:.02em;
+}
+.drawer-link:hover{opacity:1;color:var(--olive);letter-spacing:.04em}
+.drawer-footer{
+  margin-top:auto;font-size:.6rem;font-weight:300;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--ink-40);
+}
+
+/* ══════════════════════════
+   HERO
+══════════════════════════ */
+.hero{
+  min-height:100svh;display:flex;flex-direction:column;
+  position:relative;overflow:hidden;
+}
+.hero-visual{
+  flex:0 0 56svh;min-height:250px;
+  position:relative;overflow:hidden;
+}
+.hero-canvas{
+  position:absolute;inset:0;
+  background:var(--olive-pale);overflow:hidden;
+}
+.blob{
+  position:absolute;border-radius:60% 40% 70% 30% / 50% 60% 40% 70%;
+  animation:morph 16s ease-in-out infinite;
+}
+.blob-1{
+  width:68%;height:68%;
+  background:linear-gradient(135deg,#D8D4BF60,#8E8E5A28);
+  top:-8%;left:-6%;animation-delay:0s;
+}
+.blob-2{
+  width:52%;height:52%;
+  background:linear-gradient(135deg,#D6A3A840,#7D614C22);
+  bottom:0;right:-4%;animation-delay:-6s;
+  border-radius:40% 60% 30% 70% / 60% 40% 70% 30%;
+}
+.blob-3{
+  width:36%;height:36%;
+  background:linear-gradient(135deg,#EFEDDE80,#D6A3A830);
+  top:28%;left:28%;animation-delay:-11s;
+  border-radius:50% 50% 60% 40% / 40% 70% 30% 60%;
+}
+@keyframes morph{
+  0%,100%{border-radius:60% 40% 70% 30% / 50% 60% 40% 70%;transform:rotate(0deg) scale(1)}
+  33%{border-radius:70% 30% 50% 50% / 30% 60% 70% 40%;transform:rotate(4deg) scale(1.04)}
+  66%{border-radius:40% 60% 30% 70% / 60% 30% 70% 40%;transform:rotate(-3deg) scale(.97)}
+}
+.hero-mandala{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;
+}
+.hero-mandala svg{width:52%;max-width:210px;opacity:.15}
+.scroll-hint{
+  position:absolute;bottom:1.5rem;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:.4rem;
+}
+.scroll-hint span{font-size:.52rem;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-40)}
+.scroll-line{
+  width:1px;height:34px;
+  background:linear-gradient(to bottom,var(--ink-40),transparent);
+  animation:pulse 2.5s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:.35;transform:scaleY(1)}50%{opacity:.85;transform:scaleY(1.35)}}
+
+.hero-content{
+  flex:1;padding:2.5rem 1.5rem 4rem;
+  display:flex;flex-direction:column;justify-content:center;
+}
+.hero-eyebrow{
+  font-size:.58rem;font-weight:300;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--mocha);margin-bottom:1.4rem;
+  display:flex;align-items:center;gap:.75rem;
+}
+.hero-eyebrow::before{content:'';display:block;width:26px;height:1px;background:var(--mocha);flex-shrink:0}
+.hero-h1{
+  font-family:var(--f-serif);font-size:clamp(3.4rem,14vw,6.5rem);
+  font-weight:300;line-height:.95;letter-spacing:-.01em;
+  color:var(--ink);margin-bottom:1.6rem;
+}
+.hero-h1 em{font-style:italic;color:var(--olive);display:block}
+.hero-copy{
+  font-size:.82rem;font-weight:300;line-height:1.9;
+  color:var(--ink-70);max-width:340px;margin-bottom:2.4rem;
+}
+.btn-ghost{
+  display:inline-flex;align-items:center;gap:.8rem;
+  font-family:var(--f-sans);font-size:.62rem;font-weight:300;
+  letter-spacing:.22em;text-transform:uppercase;
+  color:var(--ink);text-decoration:none;
+  transition:gap .4s var(--ease),opacity .3s;
+}
+.btn-ghost:hover{gap:1.2rem;opacity:.55}
+.arrow-line{
+  width:32px;height:1px;background:var(--ink);
+  position:relative;flex-shrink:0;transition:width .4s var(--ease);
+}
+.arrow-line::after{
+  content:'';position:absolute;right:0;top:-3px;
+  width:7px;height:7px;
+  border-right:1px solid var(--ink);border-top:1px solid var(--ink);
+  transform:rotate(45deg);
+}
+.btn-ghost:hover .arrow-line{width:46px}
+
+/* ══════════════════════════
+   TICKER
+══════════════════════════ */
+.ticker{
+  padding:.7rem 0;overflow:hidden;white-space:nowrap;
+  border-top:1px solid var(--ink-06);border-bottom:1px solid var(--ink-06);
+  background:var(--linen);
+}
+.ticker-track{display:inline-flex;animation:tick 30s linear infinite}
+.ticker-item{
+  display:inline-flex;align-items:center;gap:2.2rem;padding:0 2.2rem;
+  font-size:.56rem;font-weight:300;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--ink-40);
+}
+.tdot{width:3px;height:3px;border-radius:50%;background:var(--blush);flex-shrink:0}
+@keyframes tick{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* ══════════════════════════
+   PHILOSOPHY
+══════════════════════════ */
+.section-philosophy{
+  padding:5rem 1.5rem;background:var(--linen);
+  position:relative;overflow:hidden;
+}
+.phi-bg{
+  position:absolute;right:-2rem;top:50%;transform:translateY(-50%);
+  font-family:var(--f-serif);font-size:clamp(10rem,38vw,22rem);
+  font-weight:300;font-style:italic;color:var(--ink-06);
+  pointer-events:none;line-height:1;letter-spacing:-.04em;user-select:none;
+}
+.tag{
+  font-size:.57rem;font-weight:300;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--mocha);margin-bottom:1.8rem;
+  display:inline-flex;align-items:center;gap:.7rem;
+}
+.tag::after{content:'';display:block;width:20px;height:1px;background:var(--mocha)}
+.phi-quote{
+  font-family:var(--f-serif);font-size:clamp(1.65rem,6.5vw,3rem);
+  font-weight:300;line-height:1.35;letter-spacing:-.01em;
+  color:var(--ink);margin-bottom:2rem;max-width:560px;
+  position:relative;z-index:1;
+}
+.phi-quote em{font-style:italic;color:var(--olive)}
+.phi-body{
+  font-size:.82rem;font-weight:300;line-height:1.9;
+  color:var(--ink-70);max-width:420px;margin-bottom:2.5rem;
+  position:relative;z-index:1;
+}
+.btn-line{
+  display:inline-flex;align-items:center;justify-content:center;
+  font-family:var(--f-sans);font-size:.6rem;font-weight:300;
+  letter-spacing:.22em;text-transform:uppercase;
+  color:var(--ink);background:transparent;text-decoration:none;
+  padding:.85rem 2rem;border:1px solid var(--linen-dkr);
+  transition:all .3s;width:fit-content;cursor:pointer;
+}
+.btn-line:hover{border-color:var(--ink);background:var(--ink);color:var(--linen)}
+
+/* ══════════════════════════
+   EXPERIENCES
+══════════════════════════ */
+.section-exp{background:var(--ink);overflow:hidden}
+.exp-header{
+  padding:4rem 1.5rem 2.5rem;
+  border-bottom:1px solid rgba(239,237,222,.06);
+}
+.tag-light{
+  font-size:.57rem;font-weight:300;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--blush);margin-bottom:1.2rem;display:block;
+}
+.exp-title{
+  font-family:var(--f-serif);font-size:clamp(2.4rem,10vw,5rem);
+  font-weight:300;line-height:1;letter-spacing:-.02em;color:var(--linen);
+}
+.exp-title em{font-style:italic;color:var(--blush)}
+
+.exp-list{display:flex;flex-direction:column}
+.exp-item{
+  display:grid;grid-template-columns:52px 1fr;
+  border-bottom:1px solid rgba(239,237,222,.06);
+  transition:background .4s;
+}
+.exp-item:hover{background:rgba(239,237,222,.025)}
+.exp-num-col{
+  padding:2.2rem 0 2.2rem 1.5rem;
+  display:flex;align-items:flex-start;padding-top:2.5rem;
+}
+.exp-num{
+  font-family:var(--f-serif);font-size:.72rem;font-weight:300;
+  color:var(--blush);letter-spacing:.06em;
+  writing-mode:vertical-lr;transform:rotate(180deg);line-height:1;
+}
+.exp-body{
+  padding:2.2rem 1.5rem 2.2rem .5rem;
+  border-left:1px solid rgba(239,237,222,.06);
+}
+.exp-name{
+  font-family:var(--f-serif);font-size:clamp(1.6rem,6vw,2.4rem);
+  font-weight:300;color:var(--linen);letter-spacing:-.01em;
+  margin-bottom:.3rem;line-height:1.05;
+}
+.exp-dur{
+  font-size:.57rem;font-weight:300;letter-spacing:.2em;text-transform:uppercase;
+  color:rgba(239,237,222,.3);margin-bottom:1.4rem;
+}
+.exp-rule{width:22px;height:1px;background:var(--blush);opacity:.5;margin-bottom:1.4rem}
+.exp-benefits{list-style:none;display:flex;flex-direction:column;gap:.55rem;margin-bottom:1.8rem}
+.exp-benefits li{
+  font-size:.78rem;font-weight:300;color:rgba(239,237,222,.38);
+  line-height:1.65;padding-left:.9rem;position:relative;
+}
+.exp-benefits li::before{
+  content:'';position:absolute;left:0;top:.58em;
+  width:4px;height:1px;background:var(--blush);opacity:.55;
+}
+.exp-cta{
+  font-size:.57rem;font-weight:300;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--blush-lt);text-decoration:none;
+  display:inline-flex;align-items:center;gap:.5rem;
+  transition:gap .3s,opacity .3s;opacity:.7;
+}
+.exp-cta:hover{gap:.85rem;opacity:1}
+
+/* ══════════════════════════
+   SCHEDULE
+══════════════════════════ */
+.section-sched{display:flex;flex-direction:column}
+.sched-left{
+  background:var(--olive);padding:4rem 1.5rem;
+  position:relative;overflow:hidden;
+}
+.sched-bg{
+  position:absolute;inset:0;pointer-events:none;overflow:hidden;
+}
+.sched-bg svg{position:absolute;right:-50px;bottom:-50px;width:240px;opacity:.07}
+.sched-tag{
+  font-size:.57rem;font-weight:300;letter-spacing:.26em;text-transform:uppercase;
+  color:rgba(239,237,222,.5);margin-bottom:1.2rem;display:block;
+}
+.sched-title{
+  font-family:var(--f-serif);font-size:clamp(2.2rem,9vw,4.2rem);
+  font-weight:300;line-height:1.05;color:var(--linen);
+  letter-spacing:-.01em;margin-bottom:1rem;
+}
+.sched-sub{
+  font-size:.78rem;font-weight:300;line-height:1.85;
+  color:rgba(239,237,222,.58);margin-bottom:2.5rem;max-width:320px;
+}
+.sched-right{background:var(--linen-dk);padding:2.5rem 1.5rem}
+.sched-row{
+  display:grid;grid-template-columns:85px 1fr;
+  align-items:start;gap:.5rem;
+  padding:1.4rem 0;border-bottom:1px solid var(--ink-06);
+}
+.sched-row:last-child{border-bottom:none}
+.sched-day{font-size:.58rem;font-weight:300;letter-spacing:.18em;text-transform:uppercase;color:var(--olive);padding-top:.35rem}
+.sched-classes{display:flex;flex-direction:column;gap:.3rem}
+.sched-entry{display:flex;align-items:center;justify-content:space-between;gap:.5rem}
+.sched-class{font-family:var(--f-serif);font-size:1.05rem;font-weight:300;color:var(--ink);letter-spacing:-.01em}
+.sched-time{font-size:.72rem;font-weight:300;color:var(--ink-40);white-space:nowrap;font-feature-settings:'tnum'}
+
+/* PRICING */
+.section-pricing{
+  padding:5rem 1.5rem;
+  background:var(--linen);
+}
+.pricing-tag{
+  font-size:.57rem;font-weight:300;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--mocha);margin-bottom:1.2rem;display:flex;align-items:center;gap:.7rem;
+}
+.pricing-tag::after{content:'';display:block;width:20px;height:1px;background:var(--mocha)}
+.pricing-title{
+  font-family:var(--f-serif);font-size:clamp(2.2rem,9vw,4rem);
+  font-weight:300;line-height:1.05;color:var(--ink);
+  letter-spacing:-.01em;margin-bottom:2.5rem;
+}
+.pricing-grid{
+  display:flex;flex-direction:column;gap:1px;
+  background:var(--ink-06);
+  margin-bottom:2rem;
+}
+.pricing-card{
+  background:var(--linen);
+  padding:1.8rem 1.5rem;
+  display:flex;align-items:center;justify-content:space-between;gap:1.5rem;
+  transition:background .3s;
+  position:relative;overflow:hidden;
+}
+.pricing-card::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;
+  width:2px;background:var(--mocha);
+  transform:scaleY(0);transform-origin:bottom;
+  transition:transform .35s var(--ease);
+}
+.pricing-card:hover{background:var(--mocha-pale)}
+.pricing-card:hover::before{transform:scaleY(1)}
+.pricing-info{flex:1}
+.pricing-name{
+  font-family:var(--f-serif);font-size:1.4rem;font-weight:300;
+  color:var(--ink);letter-spacing:-.01em;margin-bottom:.2rem;
+}
+.pricing-desc{
+  font-size:.72rem;font-weight:300;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-40);
+}
+.pricing-amount{
+  font-family:var(--f-serif);font-size:1.8rem;font-weight:300;
+  color:var(--mocha);letter-spacing:-.02em;white-space:nowrap;
+}
+.pricing-currency{
+  font-family:var(--f-sans);font-size:.65rem;font-weight:300;
+  color:var(--ink-40);letter-spacing:.08em;text-transform:uppercase;
+  margin-top:.2rem;text-align:right;
+}
+.pricing-note{
+  font-size:.75rem;font-weight:300;line-height:1.75;
+  color:var(--ink-40);max-width:400px;
+}
+
+/* ══════════════════════════
+   STUDIO
+══════════════════════════ */
+.section-studio{
+  padding:5rem 1.5rem;background:var(--blush-pale);
+  position:relative;overflow:hidden;
+}
+.studio-ring{
+  position:absolute;border-radius:50%;border:1px solid var(--blush-lt);
+  pointer-events:none;opacity:.3;
+}
+.studio-tag{
+  font-size:.57rem;font-weight:300;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--mocha);margin-bottom:1.2rem;display:block;
+}
+.studio-quote{
+  font-family:var(--f-serif);font-size:clamp(1.4rem,5.5vw,2.4rem);
+  font-weight:300;font-style:italic;line-height:1.4;
+  color:var(--ink);margin-bottom:.9rem;letter-spacing:-.01em;
+  position:relative;z-index:1;
+}
+.studio-author{
+  font-size:.58rem;font-weight:300;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--mocha);margin-bottom:3rem;display:block;position:relative;z-index:1;
+}
+.studio-pillars{display:flex;flex-direction:column;position:relative;z-index:1}
+.pillar{
+  padding:1.6rem 0;
+  border-bottom:1px solid rgba(125,97,76,.12);
+  display:grid;grid-template-columns:auto 1fr;gap:1.2rem;align-items:start;
+}
+.pillar:last-child{border-bottom:none}
+.pillar-i{
+  font-family:var(--f-serif);font-size:.78rem;font-weight:300;font-style:italic;
+  color:var(--mocha-lt);padding-top:.1rem;
+}
+.pillar-title{
+  font-family:var(--f-serif);font-size:1.15rem;font-weight:400;
+  color:var(--ink);margin-bottom:.35rem;letter-spacing:-.01em;
+}
+.pillar-text{font-size:.78rem;font-weight:300;line-height:1.8;color:var(--ink-70)}
+
+/* ══════════════════════════
+   CTA
+══════════════════════════ */
+.section-cta{
+  background:var(--mocha);padding:6rem 1.5rem;
+  text-align:center;position:relative;overflow:hidden;
+}
+.cta-ring{
+  position:absolute;border-radius:50%;
+  border:1px solid rgba(239,237,222,.08);
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  pointer-events:none;
+}
+.cta-tag{
+  font-size:.57rem;font-weight:300;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--blush-lt);margin-bottom:1.4rem;display:block;
+}
+.cta-title{
+  font-family:var(--f-serif);font-size:clamp(2.4rem,10vw,5.5rem);
+  font-weight:300;line-height:1;letter-spacing:-.02em;
+  color:var(--linen);margin-bottom:1.2rem;
+}
+.cta-title em{font-style:italic;color:var(--blush-lt);display:block}
+.cta-sub{
+  font-size:.8rem;font-weight:300;line-height:1.85;
+  color:rgba(239,237,222,.5);margin-bottom:3rem;
+  max-width:340px;margin-left:auto;margin-right:auto;
+}
+.cta-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  font-family:var(--f-sans);font-size:.6rem;font-weight:300;
+  letter-spacing:.22em;text-transform:uppercase;
+  color:var(--mocha);background:var(--linen);
+  text-decoration:none;padding:1rem 2.6rem;
+  transition:background .3s,color .3s;border:none;cursor:pointer;
+}
+.cta-btn:hover{background:var(--blush-pale);color:var(--mocha)}
+
+/* ══════════════════════════
+   FOOTER
+══════════════════════════ */
+footer{background:#161410;padding:4rem 1.5rem 2.5rem}
+.foot-logo-block{
+  margin-bottom:3rem;padding-bottom:2.5rem;
+  border-bottom:1px solid rgba(239,237,222,.06);
+}
+.foot-logo{
+  font-family:var(--f-serif);font-size:2.2rem;font-weight:300;font-style:italic;
+  color:var(--linen);line-height:1;margin-bottom:.6rem;letter-spacing:-.01em;
+}
+.foot-sub{
+  font-size:.57rem;font-weight:300;letter-spacing:.22em;text-transform:uppercase;
+  color:rgba(239,237,222,.2);
+}
+.foot-cols{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:2.5rem;margin-bottom:3rem;
+}
+.foot-col-title{
+  font-size:.57rem;font-weight:300;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--blush);margin-bottom:1rem;display:block;
+}
+.foot-col ul{list-style:none;display:flex;flex-direction:column;gap:.55rem}
+.foot-col a{
+  font-size:.78rem;font-weight:300;
+  color:rgba(239,237,222,.28);text-decoration:none;
+  transition:color .3s;line-height:1.6;
+}
+.foot-col a:hover{color:rgba(239,237,222,.75)}
+.foot-bottom{
+  border-top:1px solid rgba(239,237,222,.06);padding-top:1.5rem;
+  font-size:.58rem;font-weight:300;letter-spacing:.14em;text-transform:uppercase;
+  color:rgba(239,237,222,.18);display:flex;flex-direction:column;gap:.4rem;
+}
+
+/* ══════════════════════════
+   REVEAL
+══════════════════════════ */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.d1{transition-delay:.1s}.d2{transition-delay:.22s}.d3{transition-delay:.34s}.d4{transition-delay:.46s}
+
+/* ══════════════════════════
+   TABLET 640+
+══════════════════════════ */
+@media(min-width:640px){
+  .nav{padding:1.4rem 2.5rem}
+  .nav.scrolled{padding:1rem 2.5rem}
+  .burger{display:none}
+  .nav-links{display:flex}
+
+  .hero{flex-direction:row;min-height:100svh}
+  .hero-visual{flex:1;height:auto;order:2;min-height:unset}
+  .hero-content{flex:1;order:1;padding:3.5rem 2.5rem;justify-content:center}
+
+  .section-philosophy{padding:6.5rem 2.5rem}
+  .section-exp .exp-header{padding:5rem 2.5rem 3rem}
+  .exp-num-col{width:68px;padding-left:2.5rem}
+  .exp-body{padding:2.5rem 2.5rem 2.5rem 1.5rem}
+
+  .section-sched{flex-direction:row}
+  .sched-left{flex:1;padding:5rem 2.5rem}
+  .sched-right{flex:1;padding:4rem 2.5rem}
+  .sched-row{grid-template-columns:100px 1fr}
+
+  .section-pricing{padding:6.5rem 2.5rem}
+  .pricing-grid{flex-direction:row}
+  .pricing-card{flex-direction:column;align-items:flex-start;gap:.8rem;flex:1}
+  .pricing-amount{font-size:2rem}
+  .pricing-currency{text-align:left}
+
+  .section-studio{padding:6.5rem 2.5rem}
+  .studio-inner{display:grid;grid-template-columns:1fr 1fr;gap:4.5rem;align-items:start}
+  .studio-author{margin-bottom:0}
+
+  .section-cta{padding:9rem 2.5rem}
+  footer{padding:5rem 2.5rem 3rem}
+  .foot-cols{grid-template-columns:repeat(4,1fr);gap:2rem}
+  .foot-bottom{flex-direction:row;justify-content:space-between}
+}
+
+/* ══════════════════════════
+   DESKTOP 1024+
+══════════════════════════ */
+@media(min-width:1024px){
+  .nav{padding:1.5rem 4rem}
+  .nav.scrolled{padding:1.1rem 4rem}
+  .hero-content{padding:5rem 4rem}
+  .section-philosophy{padding:9rem 4rem}
+  .section-exp .exp-header{padding:6rem 4rem 3.5rem}
+  .exp-num-col{width:78px;padding-left:4rem}
+  .exp-body{padding:3rem 4rem 3rem 2rem}
+  .sched-left{padding:6.5rem 4rem}
+  .sched-right{padding:5.5rem 4rem}
+  .section-pricing{padding:9rem 4rem}
+  .section-studio{padding:9rem 4rem}
+  .studio-inner{gap:7rem}
+  .section-cta{padding:11rem 4rem}
+  footer{padding:6rem 4rem 3rem}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <a href="#" class="nav-logo">Studio KAI</a>
+  <ul class="nav-links">
+    <li><a href="#experiencias">Experiencias</a></li>
+    <li><a href="#horarios">Horarios</a></li>
+    <li><a href="#precios">Precios</a></li>
+    <li><a href="#studio">El Studio</a></li>
+    <li><a href="#contacto">Contacto</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="#reservas" class="nav-book">Reservar</a>
+    <button class="burger" id="burger" aria-label="Menú">
+      <span class="burger-line"></span>
+      <span class="burger-line"></span>
+      <span class="burger-line"></span>
+    </button>
+  </div>
+</nav>
+
+<!-- DRAWER -->
+<div class="mobile-drawer" id="drawer">
+  <a class="drawer-link" href="#experiencias" onclick="closeDrawer()">Experiencias</a>
+  <a class="drawer-link" href="#horarios" onclick="closeDrawer()">Horarios</a>
+  <a class="drawer-link" href="#precios" onclick="closeDrawer()">Precios</a>
+  <a class="drawer-link" href="#studio" onclick="closeDrawer()">El Studio</a>
+  <a class="drawer-link" href="#contacto" onclick="closeDrawer()">Contacto</a>
+  <a class="drawer-link" href="#reservas" onclick="closeDrawer()">Reservar</a>
+  <p class="drawer-footer">Brooklyn, NY — Boutique Studio</p>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-visual">
+    <div class="hero-canvas">
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+      <div class="blob blob-3"></div>
+    </div>
+    <div class="hero-mandala">
+      <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="100" cy="100" r="90" stroke="#62623E" stroke-width=".8"/>
+        <circle cx="100" cy="100" r="62" stroke="#7D614C" stroke-width=".6"/>
+        <circle cx="100" cy="100" r="34" stroke="#62623E" stroke-width=".5"/>
+        <circle cx="100" cy="100" r="12" stroke="#D6A3A8" stroke-width=".5"/>
+        <line x1="100" y1="10" x2="100" y2="190" stroke="#62623E" stroke-width=".4"/>
+        <line x1="10" y1="100" x2="190" y2="100" stroke="#62623E" stroke-width=".4"/>
+        <line x1="37" y1="37" x2="163" y2="163" stroke="#7D614C" stroke-width=".35"/>
+        <line x1="163" y1="37" x2="37" y2="163" stroke="#7D614C" stroke-width=".35"/>
+        <line x1="100" y1="10" x2="163" y2="163" stroke="#D6A3A8" stroke-width=".25" opacity=".6"/>
+        <line x1="100" y1="10" x2="37" y2="163" stroke="#D6A3A8" stroke-width=".25" opacity=".6"/>
+      </svg>
+    </div>
+    <div class="scroll-hint">
+      <div class="scroll-line"></div>
+      <span>Scroll</span>
+    </div>
+  </div>
+
+  <div class="hero-content">
+    <p class="hero-eyebrow reveal">Brooklyn, NY — Boutique Studio</p>
+    <h1 class="hero-h1 reveal d1">
+      Habitá<br>tu
+      <em>calma.</em>
+    </h1>
+    <p class="hero-copy reveal d2">Un refugio de slow living diseñado para pausar el ruido exterior, reconectar con tu cuerpo y profundizar en tu bienestar de forma consciente.</p>
+    <a href="#reservas" class="btn-ghost reveal d3">
+      <span>Reservar mi lugar</span>
+      <span class="arrow-line"></span>
+    </a>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-track">
+    <div class="ticker-item"><span>Fluid</span><span class="tdot"></span><span>Consciente</span><span class="tdot"></span><span>Holístico</span><span class="tdot"></span><span>Boutique</span><span class="tdot"></span><span>Personalizado</span><span class="tdot"></span><span>Move with us</span></div>
+    <div class="ticker-item"><span>Fluid</span><span class="tdot"></span><span>Consciente</span><span class="tdot"></span><span>Holístico</span><span class="tdot"></span><span>Boutique</span><span class="tdot"></span><span>Personalizado</span><span class="tdot"></span><span>Move with us</span></div>
+    <div class="ticker-item"><span>Fluid</span><span class="tdot"></span><span>Consciente</span><span class="tdot"></span><span>Holístico</span><span class="tdot"></span><span>Boutique</span><span class="tdot"></span><span>Personalizado</span><span class="tdot"></span><span>Move with us</span></div>
+  </div>
+</div>
+
+<!-- PHILOSOPHY -->
+<section class="section-philosophy" id="vision">
+  <div class="phi-bg">KAI</div>
+  <span class="tag reveal">Nuestra visión</span>
+  <h2 class="phi-quote reveal d1">
+    El bienestar es una experiencia <em>personal, consciente</em> y de diseño.
+  </h2>
+  <p class="phi-body reveal d2">Nuestra meta es ser tu faro de slow living — un espacio donde cada detalle está pensado para que logres un reset profundo y reconectes con tu esencia original. No somos un centro masivo. Somos un refugio.</p>
+  <a href="#studio" class="btn-line reveal d3">Acerca del studio</a>
+</section>
+
+<!-- EXPERIENCES -->
+<section class="section-exp" id="experiencias">
+  <div class="exp-header">
+    <span class="tag-light">Experiencias KAI</span>
+    <h2 class="exp-title">Un abordaje<br><em>integral.</em></h2>
+  </div>
+  <div class="exp-list">
+
+    <div class="exp-item reveal">
+      <div class="exp-num-col"><span class="exp-num">01</span></div>
+      <div class="exp-body">
+        <h3 class="exp-name">Yoga Hatha</h3>
+        <p class="exp-dur">60 minutos · Clase grupal reducida</p>
+        <div class="exp-rule"></div>
+        <ul class="exp-benefits">
+          <li>Equilibra el cuerpo y la mente a través de posturas físicas y respiración consciente</li>
+          <li>Tonifica y fortalece toda la musculatura corporal</li>
+          <li>Favorece el sueño y disminuye el estrés</li>
+          <li>Conexión con uno mismo — más presentes y felices</li>
+        </ul>
+        <a href="#horarios" class="exp-cta">Ver horarios →</a>
+      </div>
+    </div>
+
+    <div class="exp-item reveal">
+      <div class="exp-num-col"><span class="exp-num">02</span></div>
+      <div class="exp-body">
+        <h3 class="exp-name">Meditación Guiada</h3>
+        <p class="exp-dur">45 minutos · Clase grupal reducida</p>
+        <div class="exp-rule"></div>
+        <ul class="exp-benefits">
+          <li>Calma la mente y reduce el estrés en el medio de la rutina</li>
+          <li>Mayor integración física y mental</li>
+          <li>Mejora la concentración y claridad mental</li>
+          <li>Fomenta emociones positivas y espacios de manifestación</li>
+        </ul>
+        <a href="#horarios" class="exp-cta">Ver horarios →</a>
+      </div>
+    </div>
+
+    <div class="exp-item reveal">
+      <div class="exp-num-col"><span class="exp-num">03</span></div>
+      <div class="exp-body">
+        <h3 class="exp-name">Terapia Holística</h3>
+        <p class="exp-dur">45–60 minutos · Sesión individual</p>
+        <div class="exp-rule"></div>
+        <ul class="exp-benefits">
+          <li>Detectar y liberar bloqueos emocionales específicos</li>
+          <li>Conectar con el aquí y ahora</li>
+          <li>Mejorar la calidad de vida con herramientas prácticas</li>
+          <li>Sanación del cuerpo, la mente y el alma</li>
+        </ul>
+        <a href="#contacto" class="exp-cta">Consultar →</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- SCHEDULE -->
+<section class="section-sched" id="horarios">
+  <div class="sched-left">
+    <div class="sched-bg">
+      <svg viewBox="0 0 200 200" fill="none">
+        <circle cx="100" cy="100" r="92" stroke="white" stroke-width=".8"/>
+        <circle cx="100" cy="100" r="62" stroke="white" stroke-width=".5"/>
+        <circle cx="100" cy="100" r="32" stroke="white" stroke-width=".4"/>
+      </svg>
+    </div>
+    <span class="sched-tag">Horarios semanales</span>
+    <h2 class="sched-title reveal">Tu práctica,<br>cada semana.</h2>
+    <p class="sched-sub reveal d1">Diseñamos el calendario para que puedas sostener tu práctica de forma consistente — con intención, sin fricción.</p>
+    <a href="#reservas" class="btn-ghost reveal d2" style="color:var(--linen)">
+      <span>Reservar mi lugar</span>
+      <span class="arrow-line" style="background:var(--linen)"></span>
+    </a>
+  </div>
+  <div class="sched-right">
+    <div class="sched-row reveal">
+      <span class="sched-day">Martes</span>
+      <div class="sched-classes">
+        <div class="sched-entry"><span class="sched-class">Yoga Hatha</span><span class="sched-time">19:00</span></div>
+        <div class="sched-entry"><span class="sched-class">Meditación</span><span class="sched-time">20:00</span></div>
+      </div>
+    </div>
+    <div class="sched-row reveal d1">
+      <span class="sched-day">Miércoles</span>
+      <div class="sched-classes">
+        <div class="sched-entry"><span class="sched-class">Yoga Hatha</span><span class="sched-time">17:00</span></div>
+        <div class="sched-entry"><span class="sched-class">Meditación</span><span class="sched-time">19:00</span></div>
+      </div>
+    </div>
+    <div class="sched-row reveal d2">
+      <span class="sched-day">Jueves</span>
+      <div class="sched-classes">
+        <div class="sched-entry"><span class="sched-class">Yoga Hatha</span><span class="sched-time">19:00</span></div>
+        <div class="sched-entry"><span class="sched-class">Meditación</span><span class="sched-time">20:00</span></div>
+      </div>
+    </div>
+    <div class="sched-row reveal d3">
+      <span class="sched-day">Viernes</span>
+      <div class="sched-classes">
+        <div class="sched-entry"><span class="sched-class">Yoga Hatha</span><span class="sched-time">17:00</span></div>
+        <div class="sched-entry"><span class="sched-class">Meditación</span><span class="sched-time">19:00</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section-pricing" id="precios">
+  <p class="pricing-tag">Precios</p>
+  <h2 class="pricing-title">Invertí en<br>tu bienestar.</h2>
+  <div class="pricing-grid">
+
+    <div class="pricing-card reveal">
+      <div class="pricing-info">
+        <div class="pricing-name">Yoga Hatha</div>
+        <div class="pricing-desc">2 clases por semana · 60 min c/u</div>
+      </div>
+      <div>
+        <div class="pricing-amount">$45.000</div>
+        <div class="pricing-currency">por mes</div>
+      </div>
+    </div>
+
+    <div class="pricing-card reveal d1">
+      <div class="pricing-info">
+        <div class="pricing-name">Meditación Guiada</div>
+        <div class="pricing-desc">2 clases por semana · 45 min c/u</div>
+      </div>
+      <div>
+        <div class="pricing-amount">$40.000</div>
+        <div class="pricing-currency">por mes</div>
+      </div>
+    </div>
+
+    <div class="pricing-card reveal d2">
+      <div class="pricing-info">
+        <div class="pricing-name">Terapia Holística</div>
+        <div class="pricing-desc">Sesión individual · 45–60 min</div>
+      </div>
+      <div>
+        <div class="pricing-amount">$40.000</div>
+        <div class="pricing-currency">por sesión</div>
+      </div>
+    </div>
+
+  </div>
+  <p class="pricing-note reveal">Cuotas mensuales · 2 veces por semana · Grupos reducidos. ¿Querés reservar tu lugar? Escribinos y coordinamos juntas.</p>
+</section>
+
+<!-- STUDIO -->
+<section class="section-studio" id="studio">
+  <div class="studio-ring" style="width:300px;height:300px;top:-80px;right:-80px"></div>
+  <div class="studio-ring" style="width:180px;height:180px;bottom:-50px;left:-50px"></div>
+  <div class="studio-inner">
+    <div>
+      <span class="studio-tag reveal">El studio</span>
+      <blockquote class="studio-quote reveal d1">"Sanar es el arte de escucharte. Mi propósito es brindarte las herramientas para que ese encuentro con vos misma sea profundo, guiado y en paz."</blockquote>
+      <span class="studio-author reveal d2">— Kari Macario, Fundadora &amp; Terapeuta Holística</span>
+    </div>
+    <div class="studio-pillars">
+      <div class="pillar reveal">
+        <span class="pillar-i">i.</span>
+        <div>
+          <h3 class="pillar-title">Boutique</h3>
+          <p class="pillar-text">No somos un centro masivo. Diseñamos un refugio de calma con grupos reducidos para que tu práctica sea verdaderamente consciente.</p>
+        </div>
+      </div>
+      <div class="pillar reveal d1">
+        <span class="pillar-i">ii.</span>
+        <div>
+          <h3 class="pillar-title">Personalizado</h3>
+          <p class="pillar-text">Cada sesión es única. Detectamos tus bloqueos específicos para brindarte herramientas que sanen tu cuerpo y mente.</p>
+        </div>
+      </div>
+      <div class="pillar reveal d2">
+        <span class="pillar-i">iii.</span>
+        <div>
+          <h3 class="pillar-title">El ritual del espacio</h3>
+          <p class="pillar-text">Llegá 5 minutos antes, apagá el celular o ponelo en modo avión. La puerta se cierra al comenzar para proteger la energía colectiva.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section-cta" id="reservas">
+  <div class="cta-ring" style="width:520px;height:520px"></div>
+  <div class="cta-ring" style="width:320px;height:320px"></div>
+  <div class="cta-ring" style="width:160px;height:160px"></div>
+  <span class="cta-tag reveal">Comenzá hoy</span>
+  <h2 class="cta-title reveal d1">
+    Un espacio
+    <em>diseñado para vos.</em>
+  </h2>
+  <p class="cta-sub reveal d2">Ya seas principiante o busques profundizar en tu camino espiritual, tenemos el lugar que necesitás.</p>
+  <a href="mailto:hello@studiokai.com" class="cta-btn reveal d3">Reserva tu espacio</a>
+</section>
+
+<!-- FOOTER -->
+<footer id="contacto">
+  <div class="foot-logo-block">
+    <div class="foot-logo">Studio KAI</div>
+    <div class="foot-sub">Boutique Wellness Studio — Brooklyn, NY</div>
+  </div>
+  <div class="foot-cols">
+    <div class="foot-col">
+      <span class="foot-col-title">Navegación</span>
+      <ul>
+        <li><a href="#experiencias">Experiencias</a></li>
+        <li><a href="#horarios">Horarios</a></li>
+        <li><a href="#studio">El studio</a></li>
+        <li><a href="#reservas">Reservas</a></li>
+      </ul>
+    </div>
+    <div class="foot-col">
+      <span class="foot-col-title">Redes</span>
+      <ul>
+        <li><a href="#">Instagram</a></li>
+        <li><a href="#">Facebook</a></li>
+      </ul>
+    </div>
+    <div class="foot-col">
+      <span class="foot-col-title">Correo</span>
+      <ul>
+        <li><a href="mailto:hello@studiokai.com">hello@studiokai.com</a></li>
+      </ul>
+    </div>
+    <div class="foot-col">
+      <span class="foot-col-title">Dirección</span>
+      <ul>
+        <li><a href="#">224 Candyland Lane<br>Brooklyn, NY</a></li>
+        <li><a href="tel:6465554567">(646) 555-4567</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <span>Studio KAI © 2025</span>
+    <span>Todos los derechos reservados</span>
+  </div>
+</footer>
+
+<script>
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 40);
+}, { passive: true });
+
+const burger = document.getElementById('burger');
+const drawer = document.getElementById('drawer');
+burger.addEventListener('click', () => {
+  burger.classList.toggle('open');
+  drawer.classList.toggle('open');
+  document.body.style.overflow = drawer.classList.contains('open') ? 'hidden' : '';
+});
+function closeDrawer() {
+  burger.classList.remove('open');
+  drawer.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
